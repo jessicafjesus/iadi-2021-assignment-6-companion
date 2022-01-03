@@ -19,8 +19,13 @@ class SecurityConfig(
             .csrf().disable() // This allows applications to access endpoints from any source location
             .authorizeRequests()
             .antMatchers("/swagger-ui.html").permitAll()
+            .antMatchers("/v3/api-docs").permitAll()
+                //nao sei se devia
+            .antMatchers("/user/books").permitAll()
+            .antMatchers("/user/books/{id}").permitAll()
             .anyRequest().authenticated()
             .and().httpBasic()
+
             // Missing the sign-up, sign-in and sign-out endpoints
             // Missing the configuration for filters
             .and()

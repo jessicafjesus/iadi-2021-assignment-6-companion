@@ -3,6 +3,7 @@ package pt.unl.fct.di.iadidemo.bookshelf.presentation.api
 import org.springframework.web.bind.annotation.*
 
 interface GenAPI<S,T,U> { // S - InDTO, T - ListDTO, U - LongDTO
+
     @GetMapping
     fun getAll():List<T>;
 
