@@ -1,7 +1,6 @@
 package pt.unl.fct.di.iadidemo.bookshelf.presentation.controllers
 
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
 import pt.unl.fct.di.iadidemo.bookshelf.application.services.AuthorService
@@ -39,36 +38,34 @@ class BookController(val books: BookService, val authors: AuthorService) : Books
             )
         }
 
-    @CanAddBook
-    override fun addOne(elem: BookDTO):Unit {
-        val authors = authors.findByIds(elem.authors) // May return 400 (invalid request) if they do not exist
+        @CanAddBook
+        override fun addOne(elem: BookDTO):Unit {
+            val authors = authors.findByIds(elem.authors) // May return 400 (invalid request) if they do not exist
 
-        books.addOne(BookDAO(0, elem.title, authors.toMutableList(), elem.images.map { ImageDAO(0, it ) }));
-    }
+            books.addOne(BookDAO(0, elem.title, authors.toMutableList(), elem.images.map { ImageDAO(0, it ) }));
+        }
 
-    @CanSeeBook
-    override fun getOne(id:Long): BookListDTO =
-        books
-            .getOne(id)
-            .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found ${id}") }
-            .let {
-                BookListDTO(
-                    it.id,
-                    it.title,
-                    it.authors.map { AuthorsBookDTO(it.name) },
-                    it.images.map { ImageDTO(it.url) }
-                )
-            }
+        @CanSeeBook
+        override fun getOne(id:Long): BookListDTO =
+            books
+                .getOne(id)
+                .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found ${id}") }
+                .let {
+                    BookListDTO(
+                        it.id,
+                        it.title,
+                        it.authors.map { AuthorsBookDTO(it.name) },
+                        it.images.map { ImageDTO(it.url) }
+                    )
+                }
 
-    @CanUpdateBook
-    override fun updateOne(id: Long, elem: BookDTO) {
-        val authors = authors.findByIds(elem.authors) // May return 400 (invalid request) if they do not exist
+        @CanUpdateBook
+        override fun updateOne(id: Long, elem: BookDTO) {
+            val authors = authors.findByIds(elem.authors) // May return 400 (invalid request) if they do not exist
 
-        books.updateOne(id, BookDAO(0, elem.title, authors.toMutableList(), elem.images.map { ImageDAO(0, it ) }))
-    }
+            books.updateOne(id, BookDAO(0, elem.title, authors.toMutableList(), elem.images.map { ImageDAO(0, it ) }))
+        }
 
-    @CanDeleteBook
-    override fun deleteOne(id: Long) {
-        TODO("Not implemented")
-    }
+        @CanDeleteBook
+        override fun deleteOne(id: Long) { books.deleteOne(id) }
 }

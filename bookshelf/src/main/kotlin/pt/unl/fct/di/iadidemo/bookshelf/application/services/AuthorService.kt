@@ -10,4 +10,6 @@ class AuthorService(val authors:AuthorRepository) {
     fun findByIds(ids:List<Long>): List<AuthorDAO> =
         ids.map { authors.findById(it) }.filter { it.isPresent }.map { it.get() }
 
+    fun getAll(): List<AuthorDAO> = authors.findAll().toList()
+
 }

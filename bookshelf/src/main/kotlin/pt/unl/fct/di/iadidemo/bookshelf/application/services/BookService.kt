@@ -41,4 +41,6 @@ class BookService(val books: BookRepository) {
         books.save(book)
     }
 
+    fun deleteOne(id:Long) { books.deleteById(id) }
+
 }
