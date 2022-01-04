@@ -28,7 +28,6 @@ import pt.unl.fct.di.iadidemo.bookshelf.presentation.api.dto.*
 @RestController
 class BookController(val books: BookService, val authors: AuthorService) : BooksAPI {
 
-    @CrossOrigin
     @CanSeeBooks
     override fun getAll(): List<BookListDTO> =
         books.getAll().map {
@@ -40,7 +39,6 @@ class BookController(val books: BookService, val authors: AuthorService) : Books
             )
         }
 
-    @CrossOrigin
     @CanAddBook
     override fun addOne(elem: BookDTO):Unit {
         val authors = authors.findByIds(elem.authors) // May return 400 (invalid request) if they do not exist
@@ -48,7 +46,6 @@ class BookController(val books: BookService, val authors: AuthorService) : Books
         books.addOne(BookDAO(0, elem.title, authors.toMutableList(), elem.images.map { ImageDAO(0, it ) }));
     }
 
-    @CrossOrigin
     @CanSeeBook
     override fun getOne(id:Long): BookListDTO =
         books
@@ -63,7 +60,6 @@ class BookController(val books: BookService, val authors: AuthorService) : Books
                 )
             }
 
-    @CrossOrigin
     @CanUpdateBook
     override fun updateOne(id: Long, elem: BookDTO) {
         val authors = authors.findByIds(elem.authors) // May return 400 (invalid request) if they do not exist
@@ -71,7 +67,6 @@ class BookController(val books: BookService, val authors: AuthorService) : Books
         books.updateOne(id, BookDAO(0, elem.title, authors.toMutableList(), elem.images.map { ImageDAO(0, it ) }))
     }
 
-    @CrossOrigin
     @CanDeleteBook
     override fun deleteOne(id: Long) {
         TODO("Not implemented")

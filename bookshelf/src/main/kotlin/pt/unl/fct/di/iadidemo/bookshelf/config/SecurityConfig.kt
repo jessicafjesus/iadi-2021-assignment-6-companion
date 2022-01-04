@@ -20,9 +20,8 @@ class SecurityConfig(
             .authorizeRequests()
             .antMatchers("/swagger-ui.html").permitAll()
             .antMatchers("/v3/api-docs").permitAll()
-                //nao sei se devia
             .antMatchers("/user/books").permitAll()
-            .antMatchers("/user/books/{id}").permitAll()
+            .antMatchers("/user/books/*").permitAll()
             .anyRequest().authenticated()
             .and().httpBasic()
 
