@@ -12,5 +12,5 @@ data class AuthorsBookDTO(val name:String)
 
 data class AuthorDTO(val id:Long, val name:String)
 
-
+data class UserDTO(val username:String, var password:String)
 

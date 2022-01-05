@@ -33,8 +33,8 @@ class SecurityConfig(
             .addFilterBefore(UserPasswordAuthenticationFilterToJWT ("/login",
                 super.authenticationManagerBean()),
                 BasicAuthenticationFilter::class.java)
-            .addFilterBefore(UserPasswordSignUpFilterToJWT ("/signup", users),
-                BasicAuthenticationFilter::class.java)
+            //.addFilterBefore(UserPasswordSignUpFilterToJWT ("/signup", users),
+                //BasicAuthenticationFilter::class.java)
             .addFilterBefore(JWTAuthenticationFilter(),
                 BasicAuthenticationFilter::class.java)
 

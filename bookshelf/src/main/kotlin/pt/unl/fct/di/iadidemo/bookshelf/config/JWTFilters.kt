@@ -6,11 +6,14 @@ import io.jsonwebtoken.SignatureAlgorithm
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
+import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter
 import org.springframework.web.filter.GenericFilterBean
 import pt.unl.fct.di.iadidemo.bookshelf.application.services.UserService
 import pt.unl.fct.di.iadidemo.bookshelf.domain.UserDAO
+import pt.unl.fct.di.iadidemo.bookshelf.presentation.api.dto.UserDTO
 import java.util.*
 import javax.servlet.FilterChain
 import javax.servlet.ServletRequest
@@ -75,9 +78,9 @@ class UserPasswordAuthenticationFilterToJWT (
     }
 }
 
-class UserAuthToken(private var login:String) : Authentication {
+class UserAuthToken(private val login:String, private val authorities: List<GrantedAuthority>) : Authentication {
 
-    override fun getAuthorities() = null
+    override fun getAuthorities() = authorities
 
     override fun setAuthenticated(isAuthenticated: Boolean) {}
 
@@ -103,18 +106,14 @@ class JWTAuthenticationFilter: GenericFilterBean() {
         val authHeader = (request as HttpServletRequest).getHeader("Authorization")
 
         if( authHeader != null && authHeader.startsWith("Bearer ") ) {
-            val token = authHeader.substring(7) // Skip 7 characters for "Bearer "
-            val claims = Jwts.parser().setSigningKey(JWTSecret.KEY).parseClaimsJws(token).body
+            try {
+                val token = authHeader.substring(7) // Skip 7 characters for "Bearer "
+                val claims = Jwts.parser().setSigningKey(JWTSecret.KEY).parseClaimsJws(token).body
+                val role = claims["roles"].toString()
+                val authorities = listOf<SimpleGrantedAuthority>(SimpleGrantedAuthority(role.substring(12, role.length - 2 )))
 
-            // should check for token validity here (e.g. expiration date, session in db, etc.)
-            val exp = (claims["exp"] as Int).toLong()
-            if ( exp < System.currentTimeMillis()/1000) // in seconds
 
-                (response as HttpServletResponse).sendError(HttpServletResponse.SC_UNAUTHORIZED) // RFC 6750 3.1
-
-            else {
-
-                val authentication = UserAuthToken(claims["username"] as String)
+                val authentication = UserAuthToken(claims["username"] as String, authorities)
                 // Can go to the database to get the actual user information (e.g. authorities)
 
                 SecurityContextHolder.getContext().authentication = authentication
@@ -123,7 +122,10 @@ class JWTAuthenticationFilter: GenericFilterBean() {
                 addResponseToken(authentication, response as HttpServletResponse)
 
                 chain!!.doFilter(request, response)
+            } catch(e: Exception) {
+                (response as HttpServletResponse).sendError(HttpServletResponse.SC_UNAUTHORIZED) // RFC 6750 3.1
             }
+
         } else {
             chain!!.doFilter(request, response)
         }
@@ -144,7 +146,7 @@ class JWTAuthenticationFilter: GenericFilterBean() {
  *
  */
 
-class UserPasswordSignUpFilterToJWT (
+/*class UserPasswordSignUpFilterToJWT (
         defaultFilterProcessesUrl: String?,
         private val users: UserService
 ) : AbstractAuthenticationProcessingFilter(defaultFilterProcessesUrl) {
@@ -171,4 +173,4 @@ class UserPasswordSignUpFilterToJWT (
 
         addResponseToken(auth, response)
     }
-}
+}*/

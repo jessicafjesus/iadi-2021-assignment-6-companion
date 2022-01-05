@@ -1,8 +1,13 @@
 package pt.unl.fct.di.iadidemo.bookshelf.presentation.controllers
 
+import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.server.ResponseStatusException
 import pt.unl.fct.di.iadidemo.bookshelf.application.services.AuthorService
 import pt.unl.fct.di.iadidemo.bookshelf.config.*
+import pt.unl.fct.di.iadidemo.bookshelf.domain.AuthorDAO
+import pt.unl.fct.di.iadidemo.bookshelf.domain.BookDAO
+import pt.unl.fct.di.iadidemo.bookshelf.domain.ImageDAO
 import pt.unl.fct.di.iadidemo.bookshelf.presentation.api.AuthorAPI
 import pt.unl.fct.di.iadidemo.bookshelf.presentation.api.dto.*
 
@@ -30,7 +35,7 @@ class AuthorController(val authors: AuthorService) : AuthorAPI {
         ) }
 
     override fun addOne(elem: AuthorsBookDTO) {
-        TODO("Not yet implemented")
+        authors.addOne(AuthorDAO(0, elem.name));
     }
 
     override fun getOne(id: Long): AuthorDTO {
