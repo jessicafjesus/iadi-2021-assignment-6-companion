@@ -6,8 +6,6 @@ import org.springframework.web.server.ResponseStatusException
 import pt.unl.fct.di.iadidemo.bookshelf.application.services.AuthorService
 import pt.unl.fct.di.iadidemo.bookshelf.config.*
 import pt.unl.fct.di.iadidemo.bookshelf.domain.AuthorDAO
-import pt.unl.fct.di.iadidemo.bookshelf.domain.BookDAO
-import pt.unl.fct.di.iadidemo.bookshelf.domain.ImageDAO
 import pt.unl.fct.di.iadidemo.bookshelf.presentation.api.AuthorAPI
 import pt.unl.fct.di.iadidemo.bookshelf.presentation.api.dto.*
 
@@ -28,26 +26,40 @@ import pt.unl.fct.di.iadidemo.bookshelf.presentation.api.dto.*
 class AuthorController(val authors: AuthorService) : AuthorAPI {
 
     @CanSeeAuthors
-    override fun getAll(): List<AuthorDTO> =
+    override fun getAll(page: Int, size: Int): List<AuthorDTO> =
         authors.getAll().map { AuthorDTO(
             it.id,
             it.name
         ) }
 
-    override fun addOne(elem: AuthorsBookDTO) {
-        authors.addOne(AuthorDAO(0, elem.name));
-    }
+    @CanSeeAuthors
+    override fun addOne(elem: AuthorsBookDTO): AuthorDTO =
+        authors.addOne(AuthorDAO(0, elem.name))
+            .let { AuthorDTO(
+                it.id,
+                it.name
+            ) }
 
-    override fun getOne(id: Long): AuthorDTO {
+    @CanSeeAuthors
+    override fun getOne(id: Long): AuthorDTO =
+        authors
+            .getOne(id)
+            .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "Author not found ${id}") }
+            .let {
+                AuthorDTO(
+                    it.id,
+                    it.name
+                )
+            }
+
+    @CanSeeAuthors
+    override fun updateOne(id: Long, elem: AuthorsBookDTO):AuthorDTO {
         TODO("Not yet implemented")
     }
 
-    override fun updateOne(id: Long, elem: AuthorsBookDTO) {
-        TODO("Not yet implemented")
-    }
-
+    @CanSeeAuthors
     override fun deleteOne(id: Long) {
-        TODO("Not yet implemented")
+        authors.deleteOne(id)
     }
 
 }

@@ -7,35 +7,35 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
+import pt.unl.fct.di.iadidemo.bookshelf.application.services.SessionService
 import pt.unl.fct.di.iadidemo.bookshelf.application.services.UserService
 
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 class SecurityConfig(
     val customUserDetails:CustomUserDetailsService,
-    val users: UserService
+    val users: UserService,
+    val sessions: SessionService
 ) : WebSecurityConfigurerAdapter() {
 
     override fun configure(http: HttpSecurity) {
         http
             .csrf().disable() // This allows applications to access endpoints from any source location
             .authorizeRequests()
-            .antMatchers("/swagger-ui.html").permitAll()
-            .antMatchers("/v3/api-docs").permitAll()
-            .antMatchers("/user/books").permitAll()
-            .antMatchers("/user/books/*").permitAll()
+            .antMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
             .anyRequest().authenticated()
             .and().httpBasic()
-
             // Missing the sign-up, sign-in and sign-out endpoints
             // Missing the configuration for filters
-            .and()
-            .addFilterBefore(UserPasswordAuthenticationFilterToJWT ("/login",
+            .and().logout { logout -> logout
+                .permitAll()
+                .addLogoutHandler(Logout(sessions))
+                .logoutSuccessHandler(LogoutSuccess())
+            }
+            .addFilterBefore(UserPasswordAuthenticationFilterToJWT ("/login", sessions,
                 super.authenticationManagerBean()),
                 BasicAuthenticationFilter::class.java)
-            //.addFilterBefore(UserPasswordSignUpFilterToJWT ("/signup", users),
-                //BasicAuthenticationFilter::class.java)
-            .addFilterBefore(JWTAuthenticationFilter(),
+            .addFilterBefore(JWTAuthenticationFilter(users, sessions),
                 BasicAuthenticationFilter::class.java)
 
     }
