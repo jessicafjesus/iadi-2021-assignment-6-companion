@@ -109,9 +109,14 @@ class JWTAuthenticationFilter: GenericFilterBean() {
             try {
                 val token = authHeader.substring(7) // Skip 7 characters for "Bearer "
                 val claims = Jwts.parser().setSigningKey(JWTSecret.KEY).parseClaimsJws(token).body
-                val role = claims["roles"].toString()
-                val authorities = listOf<SimpleGrantedAuthority>(SimpleGrantedAuthority(role.substring(12, role.length - 2 )))
+                val roles = claims["roles"].toString()
+                val roles_array = roles.substring(1, roles.length - 1).split(", ")
+                val authorities = mutableListOf<SimpleGrantedAuthority>()
 
+                for (role in roles_array) {
+                    val r = role.substring(11, role.length - 1)
+                    authorities.add(SimpleGrantedAuthority(r))
+                }
 
                 val authentication = UserAuthToken(claims["username"] as String, authorities)
                 // Can go to the database to get the actual user information (e.g. authorities)
