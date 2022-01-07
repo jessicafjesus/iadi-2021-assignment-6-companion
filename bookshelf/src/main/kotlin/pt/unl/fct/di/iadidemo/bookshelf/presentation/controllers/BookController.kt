@@ -41,7 +41,6 @@ class BookController(val books: BookService, val authors: AuthorService) : Books
         @CanAddBook
         override fun addOne(elem: BookDTO): BookListDTO {
             val authors = authors.findByIds(elem.authors) // May return 400 (invalid request) if they do not exist
-
             return books.addOne(BookDAO(0, elem.title, authors.toMutableList(),
                 elem.images.map { ImageDAO(0, it ) })).let {
                     BookListDTO(
