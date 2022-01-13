@@ -34,8 +34,8 @@ class SecurityApplication(
         users.save(u2)
 
         val a1 = AuthorDAO(0,"Philip K. Dick")
-        val a2 = AuthorDAO(2,"Jessica")
-        val a3 = AuthorDAO(3,"Joana")
+        val a2 = AuthorDAO(0,"Jessica")
+        val a3 = AuthorDAO(0,"Joana")
 
         authors.saveAll(listOf(a1,a2,a3))
 

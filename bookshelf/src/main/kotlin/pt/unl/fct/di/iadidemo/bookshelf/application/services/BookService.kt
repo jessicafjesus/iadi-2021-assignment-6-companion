@@ -1,6 +1,8 @@
 package pt.unl.fct.di.iadidemo.bookshelf.application.services
 
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
+import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Service
 import pt.unl.fct.di.iadidemo.bookshelf.application.services.exceptions.NoBookException
 import pt.unl.fct.di.iadidemo.bookshelf.domain.BookDAO
@@ -44,4 +46,5 @@ class BookService(val books: BookRepository) {
 
     fun deleteOne(id:Long) { books.deleteById(id) }
 
+    fun getCount() : Number { return books.getCount() }
 }
